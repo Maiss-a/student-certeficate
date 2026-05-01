@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎓 اكتشف لقبك</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.card {
+    background: rgba(255,255,255,0.2);
+    padding: 30px;
+    border-radius: 20px;
+    width: 320px;
+    text-align: center;
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 10px;
+    background: #00c9a7;
+    color: white;
+    cursor: pointer;
+}
+
+.result {
+    margin-top: 15px;
+    font-size: 18px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>🎓 اكتشف لقبك</h2>
+
+    <input id="nom" placeholder="الاسم">
+    <input id="prenom" placeholder="اللقب">
+    <input type="date" id="date">
+
+    <button onclick="checkStudent()">عرض النتيجة</button>
+
+    <div id="result" class="result"></div>
+
+</div>
+
+<script>
+
+const API_URL = "https://script.google.com/macros/s/AKfycbw7Pyhd4cYTxCOPHAgkuPaaS2nnv1fNRpyUWrU_fmN0xlj_pHLYRRhaTvsjwuW_ZQnw/exec";
+
+let currentStudent = null;
+
+async function checkStudent() {
+
+    let nom = document.getElementById("nom").value.trim();
+    let prenom = document.getElementById("prenom").value.trim();
+    let date = document.getElementById("date").value;
+
+    let result = document.getElementById("result");
+
+    try {
+
+        const res = await fetch(`${API_URL}?nom=${nom}&prenom=${prenom}&date=${date}`);
+        const data = (await res.text()).trim();
+
+        console.log("API:", data);
+
+
+        if (data.startsWith("OK")) {
+
+            let parts = data.split("|");
+
+            currentStudent = {
+                nom: nom,
+                prenom: prenom,
+                titre: parts[1],
+                excellent: parts[2]
+            };
+
+            result.innerHTML = `
+                🎉 مبروك <br>
+                <b>${nom} ${prenom}</b><br><br>
+                🏆 ${parts[1]}
+            `;
+
+            if (parts[2] === "YES") {
+                result.innerHTML += `
+                    <br><br>🏅 متفوق!<br>
+                    <button onclick="generatePDF()">
+                        📄 تحميل الشهادة
+                    </button>
+                `;
+            }
+
+        } else if (data === "USED") {
+            result.innerHTML = "⛔ تم استعمال الاسم";
+        } else {
+            result.innerHTML = "❌ غير موجود";
+        }
+
+    } catch (e) {
+        console.log(e);
+        result.innerHTML = "❌ خطأ في الاتصال";
+    }
+}
+
+
+
+// 🎓 PDF
+function generatePDF() {
+
+    if (!currentStudent) return;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('landscape');
+
+    doc.setFontSize(24);
+    doc.text("شهادة تفوق", 148, 40, { align: "center" });
+
+    doc.setFontSize(18);
+    doc.text(currentStudent.nom + " " + currentStudent.prenom, 148, 90, { align: "center" });
+
+    doc.setFontSize(22);
+    doc.text(currentStudent.titre, 148, 120, { align: "center" });
+
+    doc.save("certificate.pdf");
+}
+
+</script>
+
+
+</body>
+</html>
+
