@@ -118,10 +118,10 @@ async function checkStudent() {
                 `;
             }
 
-        } else if (data === "USED") {
+        } /*else if (data === "USED") {
             result.innerHTML = "⛔ تم استعمال الاسم";
-        } else {
-            result.innerHTML = "❌ غير موجود";
+        }*/ else {
+            result.innerHTML = " غير موجود";
         }
 
     } catch (e) {
@@ -135,22 +135,34 @@ async function checkStudent() {
 // 🎓 PDF
 function generatePDF() {
 
-    if (!currentStudent) return;
-
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('landscape');
 
-    doc.setFontSize(24);
-    doc.text("شهادة تفوق", 148, 40, { align: "center" });
+    let img = new Image();
+    img.src = "certificate.png";
 
-    doc.setFontSize(18);
-    doc.text(currentStudent.nom + " " + currentStudent.prenom, 148, 90, { align: "center" });
+    img.onload = function() {
 
-    doc.setFontSize(22);
-    doc.text(currentStudent.titre, 148, 120, { align: "center" });
+        // 🖼️ إضافة الخلفية (الشهادة)
+        doc.addImage(img, 'PNG', 0, 0, 297, 210);
 
-    doc.save("certificate.pdf");
+        // ✍️ إعداد النص
+        doc.setFont("Helvetica"); // لا يهم هنا كثير
+        doc.setFontSize(28);
+
+        // 🔥 أهم شيء: عكس النص للعربية
+        let fullName = currentStudent.nom + " " + currentStudent.prenom;
+        let arabicName = fullName.split("").reverse().join("");
+
+        // 🎯 وضع الاسم في الوسط
+        doc.text(arabicName, 148, 105, { align: "center" });
+
+        doc.save("certificate.pdf");
+    }
 }
+
+
+
 
 </script>
 
