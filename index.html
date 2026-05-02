@@ -129,7 +129,7 @@ async function checkStudent() {
         result.innerHTML = "❌ خطأ في الاتصال";
     }
 }
-function generatePDF() {
+/*function generatePDF() {
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('landscape');
@@ -153,6 +153,44 @@ function generatePDF() {
 
         // 🎯 المكان المثالي
         doc.text(arabicName, 148, 95, { align: "center" });
+
+        doc.save("certificate.pdf");
+    };
+}*/
+function generatePDF() {
+
+    const { jsPDF } = window.jspdf;
+
+    let canvas = document.createElement("canvas");
+    let ctx = canvas.getContext("2d");
+
+    let img = new Image();
+    img.src = "certificate.png";
+
+    img.onload = function () {
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        // 🖼️ رسم الشهادة
+        ctx.drawImage(img, 0, 0);
+
+        // ✍️ إعداد النص العربي
+        ctx.font = "40px Arial";
+        ctx.fillStyle = "#2c3e50";
+        ctx.textAlign = "center";
+
+        let name = currentStudent.nom + " " + currentStudent.prenom;
+
+        // 🎯 المكان (عدليه إذا لزم)
+        ctx.fillText(name, canvas.width / 2, 450);
+
+        // 📄 تحويل إلى PDF
+        const doc = new jsPDF('landscape');
+
+        let imgData = canvas.toDataURL("image/png");
+
+        doc.addImage(imgData, 'PNG', 0, 0, 297, 210);
 
         doc.save("certificate.pdf");
     };
