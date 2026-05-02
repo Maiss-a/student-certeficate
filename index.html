@@ -129,8 +129,6 @@ async function checkStudent() {
         result.innerHTML = "❌ خطأ في الاتصال";
     }
 }
-
-
 function generatePDF() {
 
     const { jsPDF } = window.jspdf;
@@ -139,41 +137,26 @@ function generatePDF() {
     let img = new Image();
     img.src = "certificate.png";
 
-    img.onload = function() {
-        alert("image loaded ✅"); // 👈 مهم
-    }
+    img.onload = function () {
 
-    img.onerror = function() {
-        alert("image NOT found ❌"); // 👈 مهم
-    }
-}
-/*function generatePDF() {
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('landscape');
-
-    let img = new Image();
-    img.src = "Certificate.png";
-
-    img.onload = function() {
-
-        // 🖼️ إضافة الخلفية (الشهادة)
         doc.addImage(img, 'PNG', 0, 0, 297, 210);
 
-        // ✍️ إعداد النص
-        doc.setFont("Helvetica"); // لا يهم هنا كثير
-        doc.setFontSize(28);
+        // ✨ إعداد النص
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(30);
+        doc.setTextColor(44, 62, 80);
 
-        // 🔥 أهم شيء: عكس النص للعربية
-        let fullName = currentStudent.nom + " " + currentStudent.prenom;
-        let arabicName = fullName.split("").reverse().join("");
+        let name = currentStudent.nom + " " + currentStudent.prenom;
 
-        // 🎯 وضع الاسم في الوسط
-        doc.text(arabicName, 148, 105, { align: "center" });
+        // 🔥 إصلاح العربية
+        let arabicName = name.split("").reverse().join("");
+
+        // 🎯 المكان المثالي
+        doc.text(arabicName, 148, 95, { align: "center" });
 
         doc.save("certificate.pdf");
-    }
-}*/
+    };
+}
 </script>
 
 
